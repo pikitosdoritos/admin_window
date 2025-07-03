@@ -1,7 +1,6 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QLineEdit, QVBoxLayout, QLabel, QListWidget, QFormLayout, QPushButton
+from PySide6.QtWidgets import QApplication, QWidget, QLineEdit, QVBoxLayout, QLabel, QListWidget, QListWidgetItem, QFormLayout, QPushButton
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QColor
-
 
 def main():     
     def add_form():
@@ -27,17 +26,25 @@ def main():
     
     def add_list():
         def show_users():
-            logins = [user['login'] for user in users]
             list.clear()
-            list.addItems(logins)
+            for user in users:
+                item = QListWidgetItem(user['login'])
+                item.setData(ID, user['id'])                                           
+                list.addItem(item)
 
-        list = QListWidget()
+        def show_user_details(item):
+            print(item.data(ID))
+            
+                        
+        ID = Qt.UserRole
+        list = QListWidget()        
         
-        show_users()
+        list.itemDoubleClicked.connect(show_user_details)
+
         layout.addWidget(list) 
-
+        show_users()
+        
         return show_users
-
 
     def gen_id():
         id = next['id']
@@ -53,14 +60,10 @@ def main():
     ]
      
     app =  QApplication()
-    window = QMainWindow()
-    wrapper = QWidget()
+    window = QWidget()
     layout = QVBoxLayout()
 
-    layout.setAlignment(Qt.AlignCenter)
-    wrapper.setLayout(layout)
-
-    window.setCentralWidget(wrapper)
+    window.setLayout(layout)    
     window.setWindowTitle('Users CRUD')
     window.resize(900, 750)
 
