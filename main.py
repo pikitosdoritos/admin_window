@@ -1,5 +1,8 @@
 from PySide6.QtWidgets import QApplication, QWidget, QLineEdit, QVBoxLayout, QHBoxLayout, QListWidget, QListWidgetItem, QFormLayout, QPushButton
 from PySide6.QtCore import Qt
+import os, json
+
+DATA_FILE = 'users.json'
 
 def main():
     def add_form():
@@ -10,6 +13,7 @@ def main():
             
             users.append(user)
             show_users()
+            save_users()
 
         def handle_delete():
             item = get_selected()
@@ -19,6 +23,7 @@ def main():
             if user in users:
                 users.remove(user)
                 show_users()
+                save_users()
 
         form = QFormLayout()
         login_input = QLineEdit()
@@ -33,7 +38,7 @@ def main():
 
         btn_layout.addWidget(add_btn)
         btn_layout.addWidget(del_btn)
-        
+
         add_btn.clicked.connect(handle_submit)
         del_btn.clicked.connect(handle_delete)
 
@@ -58,7 +63,7 @@ def main():
 
         layout.addWidget(user_list) 
         show_users()
-        
+                
         return show_users, get_selected
         
     def add_window():
@@ -67,6 +72,7 @@ def main():
             current['user']['password'] = pwd_input.text()
             child_window.close()
             show_users()
+            save_users()
                         
         def show_user_details(item):
             child_window.show()
@@ -104,16 +110,22 @@ def main():
         id = next_gen['id']
         next_gen['id'] += 1
         return id
+    
+    def load_users():
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'r', encoding = 'utf-8') as file:
+                return json.load(file)
+        return []
+
+    def save_users():
+        with open(DATA_FILE, 'w', encoding = 'utf-8') as file:
+            json.dump(users, file, ensure_ascii = False, indent = 4)
 
     next_gen = {'id': 1}     
     
     ID = Qt.UserRole
-    
-    users = [
-        {'id': gen_id(), 'login': 'Bob', 'password': '84308459'}, 
-        {'id': gen_id(), 'login': 'Alex', 'password': '1234567'}, 
-        {'id': gen_id(), 'login': 'Steve', 'password': '0987654321'}
-    ]
+
+    users = load_users()
      
     app =  QApplication()
     window = QWidget()
